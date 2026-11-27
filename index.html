@@ -4,18 +4,25 @@
 :root{color-scheme:dark;--frame:#1b2a36;--edge:#425868;--text:#f3fafb;--soft:#b9ced8;--screen:#41a1d4}*{box-sizing:border-box}body{margin:0;color:var(--text);background:var(--frame);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}button{cursor:pointer;color:inherit;font:inherit;touch-action:manipulation}button:focus-visible,canvas:focus-visible,a:focus-visible{outline:2px solid white;outline-offset:-2px}button{border:1px solid #577080;background:#293e4b;border-radius:4px;min-height:33px;padding:0 12px;font-size:13px}button:hover{background:#365265}.icon{display:grid;place-items:center;width:35px;padding:0}.icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}[hidden]{display:none!important}main{height:100svh;min-height:360px;display:flex;flex-direction:column;background:var(--frame)}header,footer,.actions,.readings,.legend,.title,.tools,.atlas-head{display:flex;align-items:center}header{min-height:54px;gap:16px;justify-content:space-between;padding:7px 16px;border-bottom:1px solid #486273}.title{gap:12px;min-width:0}.title small{font:650 12px ui-monospace,monospace;color:#a5c6d7;letter-spacing:.08em}.title h1{font-size:clamp(16px,2vw,24px);font-weight:650;line-height:1.3;margin:0;letter-spacing:.04em}.tools,.actions{gap:7px}.stage{flex:1;min-height:0;position:relative;overflow:hidden;border:1px solid #122d42;background:#20657e}.stage>canvas{display:block;width:100%;height:100%;cursor:crosshair;touch-action:none;outline-offset:-2px}.atlas{position:absolute;top:12px;left:12px;width:clamp(150px,18vw,282px);background:#15465ceb;border:1px solid #b3e4f18c;border-radius:3px;color:#eafaff}.atlas-head{justify-content:space-between;padding:4px 7px 0 9px;font-size:12px}.atlas-head button{font-size:11px;border:0;min-height:25px;background:transparent;color:#d3edf7;padding:0 4px}.atlas-head button:hover{text-decoration:underline}.atlas canvas{display:block;width:100%;height:auto;aspect-ratio:1.87}.bearing{position:absolute;top:14px;right:14px;color:white;background:#10495fd9;padding:5px 10px;border:1px solid #b3e4f166;border-radius:2px;font:600 12px ui-monospace,monospace;pointer-events:none}.scale{position:absolute;right:22px;bottom:17px;color:#f6ffff;font:650 13px ui-monospace,monospace;text-align:center;pointer-events:none;text-shadow:0 1px 2px #336b8b}.scale i{display:block;height:5px;border:solid #e8fcff;border-width:0 1.5px 2px}.under{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 14px;border-bottom:1px solid #38505f}.readings,.legend{gap:13px}.readings{font-size:13px}.readings strong{font-size:15px}.readings span{color:var(--soft)}.track{height:4px;width:clamp(55px,8vw,160px);background:#4c6778;position:relative}.track:after{content:'';position:absolute;left:50%;height:8px;top:-2px;border-left:1px solid #c1dae2}.track i{background:#9addeb;display:block;height:100%}.actions,.record{font-size:12px;color:#d3e5ec}.actions button,.primary{background:#ccecf2;border-color:#dcf6fa;color:#143748;font-weight:650}.actions button:hover,.primary:hover{background:white}footer{padding:6px 15px;min-height:31px;justify-content:space-between;gap:12px;font-size:12px;color:#c5d9e2}footer p{margin:0}.legend{white-space:nowrap}.legend span{display:flex;align-items:center;gap:6px}.legend i{width:11px;height:11px;border-radius:50%}.dot{border:1px dashed #d7f6fa}.wave{border:1.5px solid white}.goal{background:#f88287}.record{font-variant-numeric:tabular-nums}dialog{width:min(415px,calc(100vw - 28px));background:#1c3545;color:white;border:1px solid #7799a9;border-radius:6px;padding:24px}dialog::backdrop{background:#0c1824bd}dialog h2{margin:0 0 12px;font-size:23px}dialog p{font-size:14px;color:#d7e7ed;line-height:1.8;white-space:pre-line}dialog a{color:#b7eef8;font-size:12px}dialog .buttons{display:flex;gap:9px;margin-top:14px}.buttons button{min-height:39px}
 @media(max-width:650px){header{min-height:43px;padding:4px 7px;gap:3px}.title{gap:5px}.title small{font-size:9px}.title h1{font-size:15px;letter-spacing:0}.tools{gap:4px}.tools button{font-size:11px;padding:0 6px;min-height:30px}.tools .icon{width:29px}.atlas{width:140px;top:7px;left:7px}.bearing{top:8px;right:7px;font-size:10px;padding:4px}.under{padding:6px 7px;flex-wrap:wrap;gap:5px}.readings,.actions{gap:6px}.readings{font-size:11px}.readings strong{font-size:13px}.actions{font-size:10px}.actions button{padding:0 7px;font-size:11px}.record,#sector{display:none}.track{width:40px}footer{padding:4px 7px;flex-wrap:wrap;gap:3px;font-size:11px}.legend{gap:9px}.scale{right:12px;bottom:10px}}@media(max-height:480px){header{min-height:36px}.atlas{width:130px}.under{padding:3px 8px}footer{min-height:18px;padding:2px 9px}.scale{bottom:7px}}
 .actions .aid{background:transparent;border-color:#7292a3;color:#d3e5ec}.actions .aid[aria-pressed=true]{background:#c1f3d8;border-color:#d5ffe6;color:#153d2d}@media(max-width:480px){.actions{margin-left:auto}.under{row-gap:4px}}
+@media(pointer:coarse){
+  main{min-height:min(360px,100svh);padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+  .stage>canvas,button{-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+  .stage>canvas{-webkit-touch-callout:none}
+  #rk-dialog .rk-panel input{font-size:16px}
+}
 </style></head><body><main>
 <header><div class="title"><small>CAT.44</small><h1>冬冬拯救行动方案五</h1></div><div class="tools"><button class="icon" id="sound" aria-label="开启音效"></button><button class="icon" id="full" aria-label="全屏" title="全屏"><svg viewBox="0 0 24 24"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></svg></button><button id="help">怎么玩</button></div></header>
 <div class="stage map"><canvas tabindex="0" aria-label="空间跳一跳。点圆内传送到所点位置，点圆外沿该方向跳到圆周；键盘可左右转向后按空格。"></canvas><aside class="atlas"><div class="atlas-head"><b>山体剖面</b><button id="zoom" aria-pressed="false">展开全图 ↗</button></div><canvas id="overview" aria-label="山体、当前视野、小黑及已启动的波源"></canvas></aside><span class="bearing" id="bearing"></span><div class="scale"><span id="rulerText">25 m</span><i id="rulerBar"></i></div></div>
 <div class="under"><div class="readings"><span id="sector"></span><strong id="chapter"></strong><span id="bells"></span></div><div class="actions"><span class="record" id="jumpCount">0 跳</span><div class="track"><i id="progress"></i></div><span id="count"></span><button class="aid" id="hints" aria-label="触碰提示" aria-pressed="false" title="显示钟波碰撞预警，开启后本局转为练习">提示：关</button><button class="aid" id="invincible" aria-label="无敌" aria-pressed="false" title="免疫钟波伤害，开启后本局转为练习">无敌：关</button><button id="pause">开始行动</button></div></div>
 <footer><p id="radio" aria-live="polite"></p><div class="legend"><span><i class="dot"></i>传送范围</span><span><i class="wave"></i>钟波</span><span><i class="goal"></i><b id="goalLabel" style="font-weight:inherit">接应点</b></span></div></footer>
-</main><dialog><h2 id="dt"></h2><p id="dd"></p><p id="rank-result" aria-live="polite" hidden></p><a id="original" href="https://www.bilibili.com/bangumi/play/ep6762153?t=1290" target="_blank" rel="noopener" hidden>对照第 44 集会馆监测画面 ↗</a><div class="buttons"><button class="primary" id="ok"></button><button id="back" hidden>回到起点</button></div></dialog>
+</main><dialog aria-labelledby="dt" aria-describedby="dd"><h2 id="dt"></h2><p id="dd"></p><p id="rank-result" aria-live="polite" hidden></p><a id="original" href="https://www.bilibili.com/bangumi/play/ep6762153?t=1290" target="_blank" rel="noopener" hidden>对照第 44 集会馆监测画面 ↗</a><div class="buttons"><button class="primary" id="ok"></button><button id="back" hidden>回到起点</button></div></dialog>
 <script>
 'use strict';
 const $=s=>document.querySelector(s), canvas=$('canvas'),ctx=canvas.getContext('2d'),dialog=$('dialog');
 const TAU=Math.PI*2, JUMP=100, SPEED=42, MAX_WAVE=10200, BODY=5, EDGE=2;
 const SOLO_PERIOD=6.5, PRIMARY_LATE_PERIOD=5.2, EXTRA_PERIOD=7.5;
 const JUMP_COOLDOWN=.5;
+const coarsePointer=window.matchMedia('(pointer: coarse)');
 const W=8600,H=4600, origin={x:1450,y:2950}, target={x:6850,y:2950}, halfX=(origin.x+target.x)/2;
 const firstBell={x:target.x-120,y:target.y-14};
 let bells=[];
@@ -105,7 +112,7 @@ function status(){
   $('#progress').style.width=runBest+'%';
   $('#pause').textContent=run==='ready'?'开始行动':'暂停';
   const practice=(run==='ready'?hints||invincible:testRun)?' · 练习模式':'';
-  const radio=run==='ended'?'行动结束':returning?'已接到冬冬，向左返回起点。':run==='ready'?'向右接到冬冬，再带他回到起点。':half?'四座新钟已启动，继续向右接近冬冬。':'向右接近冬冬，避开白色波前。';
+  const radio=run==='ended'?'行动结束':returning?'已接到冬冬，向左返回起点。':run==='ready'?(coarsePointer.matches?'点圆内短跳，点圆外就朝手指方向跳到圈边。':'向右接到冬冬，再带他回到起点。'):half?'四座新钟已启动，继续向右接近冬冬。':'向右接近冬冬，避开白色波前。';
   $('#radio').textContent=radio+practice;
 }
 function finish(won,landedOnWave=false){
@@ -208,17 +215,34 @@ function advance(dt){
   if(impact){finish(false);return}
   waves=waves.filter(w=>(time-w.start)*SPEED<=MAX_WAVE);
 }
+const touchCamera=window.matchMedia?.('(pointer: coarse) and (max-width: 1024px)');
+const cameraAtlas=$('.atlas');
+let measuredWidth=-1,measuredHeight=-1,atlasBottom=0;
 function view(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
   if(wideView){
-    const w=canvas.clientWidth,h=canvas.clientHeight,s=Math.min(w/(W+64),h/(H+64));
+    const s=Math.min(w/(W+64),h/(H+64));
     return {w,h,s,x:(W-w/s)/2,y:(H-h/s)/2}
   }
-  const w=canvas.clientWidth,h=canvas.clientHeight;
-  const scale=Math.min(w/460,Math.max(h/940,w/1620));
+  let scale=Math.min(w/460,Math.max(h/940,w/1620));
+  let followX=.38,followY=.52;
+  if(touchCamera?.matches){
+    const portrait=window.innerHeight>=window.innerWidth;
+    if(w!==measuredWidth||h!==measuredHeight){
+      atlasBottom=cameraAtlas.offsetTop+cameraAtlas.offsetHeight;
+      measuredWidth=w;measuredHeight=h;
+    }
+    // Size the playable disk in CSS pixels so taps correspond to distinct short jumps.
+    const radius=portrait?Math.min(120,w*.285,Math.max(1,(h-atlasBottom-16)/2)):Math.min(85,w*.13,h*.34);
+    scale=radius/JUMP;
+    followX=portrait ? .47 : .43;
+    if(returning)followX=1-followX;
+    // The atlas occupies the top corner of a short portrait viewport.
+    followY=portrait ? Math.max(h*.55,atlasBottom+radius+8)/h : .54;
+  }
   const visibleW=w/scale,visibleH=h/scale;
   const axis=(center,span,total)=>span>=total?(total-span)/2:Math.max(0,Math.min(total-span,center));
-  return {w,h,s:scale,x:axis(player.x-visibleW*.38,visibleW,W),y:axis(player.y-visibleH*.52,visibleH,H)}
-
+  return {w,h,s:scale,x:axis(player.x-visibleW*followX,visibleW,W),y:axis(player.y-visibleH*followY,visibleH,H)}
 }
 function aim(e){
   if(panelOpen||paused||(run!=='playing'&&run!=='ready'))return;
@@ -539,13 +563,25 @@ function drawWarning(point,text,v){
   ctx.fillStyle='#243c4aed';ctx.fillRect(x-width/2,y-fontSize-pad,width,fontSize+2*pad);
   ctx.fillStyle='#ffddaa';ctx.fillText(text,x,y);ctx.restore()
 }
+// Keep the static topography separate from the mini-map's moving fronts and markers.
+const overviewTerrain=document.createElement('canvas'),overviewTerrainBrush=overviewTerrain.getContext('2d');
+let overviewDpr=0;
 function drawOverview(v){
   const w=overview.clientWidth,h=overview.clientHeight,d=Math.min(devicePixelRatio||1,2);
   if(!w||!h)return;
-  if(overview.width!==Math.round(w*d)||overview.height!==Math.round(h*d)){overview.width=Math.round(w*d);overview.height=Math.round(h*d)}
-  const k=Math.min((w-12)/W,(h-6)/H);
-  mini.setTransform(d,0,0,d,0,0);mini.clearRect(0,0,w,h);mini.translate((w-W*k)/2,(h-H*k)/2);mini.scale(k,k);
-  renderRockTerrain(mini,{x:0,y:0,s:k,w:W*k,h:H*k},true);mini.strokeStyle='#a4cfdc';mini.lineWidth=.8/k;mini.stroke(mountain);
+  const width=Math.round(w*d),height=Math.round(h*d);
+  const k=Math.min((w-12)/W,(h-6)/H),left=(w-W*k)/2,top=(h-H*k)/2;
+  if(overview.width!==width||overview.height!==height||overviewDpr!==d){
+    overview.width=overviewTerrain.width=width;
+    overview.height=overviewTerrain.height=height;
+    overviewDpr=d;
+    const bg=overviewTerrainBrush;
+    bg.setTransform(d,0,0,d,0,0);bg.translate(left,top);bg.scale(k,k);
+    renderRockTerrain(bg,{x:0,y:0,s:k,w:W*k,h:H*k},true);
+    bg.strokeStyle='#a4cfdc';bg.lineWidth=.8/k;bg.stroke(mountain);
+  }
+  mini.setTransform(1,0,0,1,0,0);mini.clearRect(0,0,width,height);mini.drawImage(overviewTerrain,0,0);
+  mini.setTransform(d,0,0,d,0,0);mini.translate(left,top);mini.scale(k,k);
   mini.save();mini.clip(mountain);mini.strokeStyle='#daf6ff89';mini.lineWidth=.6/k;mini.beginPath();
   for(const wave of waves){const b=bells[wave.i],r=Math.max(0,(time-wave.start)*SPEED);mini.moveTo(b.x+r,b.y);mini.arc(b.x,b.y,r,0,TAU)}
   mini.stroke();mini.fillStyle='#e3f4ff16';mini.fillRect(v.x,v.y,v.w/v.s,v.h/v.s);mini.restore();
@@ -553,6 +589,8 @@ function drawOverview(v){
   function mark(p,r,c){mini.beginPath();mini.arc(p.x,p.y,r/k,0,TAU);mini.fillStyle=c;mini.fill()}
   bells.forEach(b=>mark(b,1.4,'#ddf2fc'));mark(returning?origin:target,2.7,targetInk);mark(player,3.5,'#173c50');mark(player,2.2,pointInk)
 }
+const bearingLabel=$('#bearing'),rulerText=$('#rulerText'),rulerBar=$('#rulerBar');
+let rulerScale=0,rulerMeters=0;
 function draw(){
   const v=view(),{w,h,s,x,y}=v;if(!w||!h)return;const d=Math.min(devicePixelRatio||1,2);
   if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
@@ -572,13 +610,18 @@ function draw(){
   const landingETA=hints&&valid?inspectLanding(to):Infinity;
   const aimInk=!valid?'#8d9da5':landingETA===0?'#ff9997':Number.isFinite(landingETA)?'#ffe2a3':cooling?'#c2eeff66':'#ddfbff';
   // Light tint marks the whole selectable disk.
-  ring(player.x,player.y,JUMP,null,0,'#c5f3ff0a');
-  ctx.setLineDash([3/s,5/s]);ring(player.x,player.y,JUMP,'#cef3ffd9',1/s);ctx.setLineDash([]);
+  const touchRange=coarsePointer.matches&&!wideView;
+  ring(player.x,player.y,JUMP,null,0,touchRange?'#c5f3ff12':'#c5f3ff0a');
+  ctx.setLineDash(touchRange?[5/s,5/s]:[3/s,5/s]);
+  ring(player.x,player.y,JUMP,touchRange&&cooling?'#cef3ff80':'#cef3ffd9',(touchRange?1.75:1)/s);ctx.setLineDash([]);
   line(player.x,player.y,to.x,to.y,'#c2eeff85',1/s);ring(to.x,to.y,Math.max(4,3.5/s),aimInk,1.5/s);
-  if(cooling&&valid){
+  if(cooling&&(touchRange||valid)){
     const fraction=1-(nextJumpAt-time)/JUMP_COOLDOWN;
-    ctx.beginPath();ctx.arc(to.x,to.y,Math.max(4,3.5/s),-Math.PI/2,-Math.PI/2+TAU*fraction);
-    ctx.strokeStyle='#edfcff';ctx.lineWidth=1.75/s;ctx.stroke()
+    const center=touchRange?player:to;
+    const radius=touchRange?12/s:Math.max(4,3.5/s);
+    if(touchRange)ring(center.x,center.y,radius,'#284555b0',3/s);
+    ctx.beginPath();ctx.arc(center.x,center.y,radius,-Math.PI/2,-Math.PI/2+TAU*fraction);
+    ctx.strokeStyle=touchRange?'#b8f5ec':'#edfcff';ctx.lineWidth=(touchRange?2.5:1.75)/s;ctx.stroke()
   }
   drawPlayer(v);
   if(hints&&!wideView&&run==='playing'){
@@ -588,17 +631,30 @@ function draw(){
   }
   drawOverview(v);
   const dist=Math.hypot(goal.x-player.x,goal.y-player.y);
-  $('#bearing').textContent=(returning?'起点 ':'接应点 ')+(goal.x>=player.x?'→':'←')+'　'+Math.ceil(dist/JUMP)+' 跳';
-  $('#bearing').hidden=goal.x>=x&&goal.x<=x+w/s&&goal.y>=y&&goal.y<=y+h/s;
-  const meters=wideView?250:25;$('#rulerText').textContent=meters+' m';$('#rulerBar').style.width=meters*s+'px'
+  const bearing=(returning?'起点 ':'接应点 ')+(goal.x>=player.x?'→':'←')+'　'+Math.ceil(dist/JUMP)+' 跳';
+  const goalVisible=goal.x>=x&&goal.x<=x+w/s&&goal.y>=y&&goal.y<=y+h/s;
+  if(bearingLabel.textContent!==bearing)bearingLabel.textContent=bearing;
+  if(bearingLabel.hidden!==goalVisible)bearingLabel.hidden=goalVisible;
+  const meters=wideView?250:25;
+  if(meters!==rulerMeters||s!==rulerScale){
+    rulerMeters=meters;rulerScale=s;rulerText.textContent=meters+' m';rulerBar.style.width=meters*s+'px'
+  }
 }
+let readyAimX,readyAimY,readyAngle;
 function frame(now){
   if(run==='playing'&&!paused&&!panelOpen){
     let remain=last===null?0:Math.min(.15,(now-last)/1000);
     while(remain>0&&run==='playing'){const dt=Math.min(1/120,remain);advance(dt);remain-=dt}
     if(run==='playing')draw()
   }
-  if(run==='ready'&&!paused&&!panelOpen){angle+=((held.has('ArrowRight')?1:0)-(held.has('ArrowLeft')?1:0))*2.8*(last===null?0:Math.min(.1,(now-last)/1000));draw()}
+  if(run==='ready'&&!paused&&!panelOpen){
+    angle+=((held.has('ArrowRight')?1:0)-(held.has('ArrowLeft')?1:0))*2.8*(last===null?0:Math.min(.1,(now-last)/1000));
+    const aimX=pointerAim?.x,aimY=pointerAim?.y,d=Math.min(devicePixelRatio||1,2);
+    if(readyAngle!==angle||readyAimX!==aimX||readyAimY!==aimY||
+       canvas.width!==Math.round(canvas.clientWidth*d)||canvas.height!==Math.round(canvas.clientHeight*d)){
+      draw();readyAngle=angle;readyAimX=aimX;readyAimY=aimY;
+    }
+  }
   last=now;requestAnimationFrame(frame)
 }
 $('#zoom').onclick=()=>{
