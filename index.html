@@ -12,7 +12,7 @@
 }
 </style></head><body><main>
 <header><div class="title"><small>CAT.44</small><h1>冬冬拯救行动方案五</h1></div><div class="tools"><button class="icon" id="sound" aria-label="开启音效"></button><button class="icon" id="full" aria-label="全屏" title="全屏"><svg viewBox="0 0 24 24"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></svg></button><button id="help">怎么玩</button></div></header>
-<div class="stage map"><canvas tabindex="0" aria-label="空间跳一跳。点圆内传送到所点位置，点圆外沿该方向跳到圆周；键盘可左右转向后按空格。"></canvas><aside class="atlas"><div class="atlas-head"><b>山体剖面</b><button id="zoom" aria-pressed="false">展开全图 ↗</button></div><canvas id="overview" aria-label="山体、当前视野、小黑及已启动的波源"></canvas></aside><span class="bearing" id="bearing"></span><div class="scale"><span id="rulerText">25 m</span><i id="rulerBar"></i></div></div>
+<div class="stage map"><canvas tabindex="0" aria-label="空间跳一跳。触屏按住拖动查看落点，松手传送。圆内短跳，圆外沿该方向跳到圈边。鼠标点击或键盘转向后按空格也可传送。"></canvas><aside class="atlas"><div class="atlas-head"><b>山体剖面</b><button id="zoom" aria-pressed="false">展开全图 ↗</button></div><canvas id="overview" aria-label="山体、当前视野、小黑及已启动的波源"></canvas></aside><span class="bearing" id="bearing"></span><div class="scale"><span id="rulerText">25 m</span><i id="rulerBar"></i></div></div>
 <div class="under"><div class="readings"><span id="sector"></span><strong id="chapter"></strong><span id="bells"></span></div><div class="actions"><span class="record" id="jumpCount">0 跳</span><div class="track"><i id="progress"></i></div><span id="count"></span><button class="aid" id="hints" aria-label="触碰提示" aria-pressed="false" title="显示钟波碰撞预警，开启后本局转为练习">提示：关</button><button class="aid" id="invincible" aria-label="无敌" aria-pressed="false" title="免疫钟波伤害，开启后本局转为练习">无敌：关</button><button id="pause">开始行动</button></div></div>
 <footer><p id="radio" aria-live="polite"></p><div class="legend"><span><i class="dot"></i>传送范围</span><span><i class="wave"></i>钟波</span><span><i class="goal"></i><b id="goalLabel" style="font-weight:inherit">接应点</b></span></div></footer>
 </main><dialog aria-labelledby="dt" aria-describedby="dd"><h2 id="dt"></h2><p id="dd"></p><p id="rank-result" aria-live="polite" hidden></p><a id="original" href="https://www.bilibili.com/bangumi/play/ep6762153?t=1290" target="_blank" rel="noopener" hidden>对照第 44 集会馆监测画面 ↗</a><div class="buttons"><button class="primary" id="ok"></button><button id="back" hidden>回到起点</button></div></dialog>
@@ -48,7 +48,7 @@ const overview=$('#overview'),mini=overview.getContext('2d');
 let player, angle, flash, waves, nextPulse, time, jumps, half, runBest, last, run='home', paused=false, accept, impact=null;
 let muted=true,ac;
 const held=new Set();
-let pointerAim=null, nextJumpAt=0;
+let pointerAim=null, nextJumpAt=0, touchAimId=null;
 let wideView=false, invincible=false, hints=false, testRun=false, returning=false, panelOpen=false;
 function updateAid(button, label, enabled){
   button.setAttribute('aria-pressed',String(enabled));
@@ -65,7 +65,17 @@ try{muted=localStorage.heiJumpAudio!=='on'}catch{}
 function audioUI(){const b=$('#sound');b.setAttribute('aria-label',muted?'开启音效':'关闭音效');b.setAttribute('aria-pressed',String(!muted));b.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 9h4l5-4v14l-5-4H3z"/>'+(muted?'<path d="m16 9 6 6m0-6-6 6"/>':'<path d="M16 8q4 4 0 8m3-11q7 7 0 14"/>')+'</svg>'}
 function tone(hz,d=.12){if(muted)return;try{ac??=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume().catch(()=>{});const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=hz;g.gain.setValueAtTime(.065,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.start();o.stop(ac.currentTime+d)}catch{}}
 $('#sound').onclick=()=>{muted=!muted;if(bellAudioBus)bellAudioBus.gain.value=muted?0:.65;try{localStorage.heiJumpAudio=muted?'off':'on'}catch{}audioUI();tone(530)};
-function endInput(){held.clear();pointerAim=null}
+function clearTouchAim(){
+  if(touchAimId===null)return;
+  const id=touchAimId;
+  touchAimId=null;pointerAim=null;
+  if(canvas.hasPointerCapture(id))canvas.releasePointerCapture(id)
+}
+function endInput(){
+  const hadTouch=touchAimId!==null;
+  clearTouchAim();held.clear();pointerAim=null;
+  if(hadTouch&&player)draw()
+}
 function modal(title,body,ok,action,allowHome=false){
   endInput();paused=true;$('#rank-result').hidden=run!=='ended';$('#original').hidden=title!=='怎么跳？';$('#dt').textContent=title;$('#dd').textContent=body;$('#ok').textContent=ok;
   $('#back').hidden=!allowHome;accept=action;dialog.showModal()
@@ -73,10 +83,13 @@ function modal(title,body,ok,action,allowHome=false){
 function dismiss(){dialog.close();paused=false;last=null;if(run==='playing'||run==='ready')canvas.focus({preventScroll:true})}
 $('#ok').onclick=()=>{dismiss();accept?.()};$('#back').onclick=()=>{dismiss();home()};
 dialog.oncancel=e=>{e.preventDefault();dismiss();if(run==='ended')home()};
-function help(){modal('怎么跳？','向右接到冬冬，再带他返回起点。接到冬冬时记单程用时，回到起点时记全程用时，两项各有排行榜。游客可以直接游玩。登录后，从开局起关闭触碰提示和无敌即可参与排行。\n\n点虚线圆内，传送到点击处；点圆外，沿该方向跳到圆周。每跳冷却 0.5 秒，也可按 ← → 转向、空格按最大距离传送。\n\n白色亮边是钟波的危险波前，浅色拖尾是它刚扫过的位置。你可以跳到波纹另一侧。越过去程中线，靠近冬冬的一侧会增加四座钟。\n\n开启提示可见钟波倒计时和落点危险颜色。开启无敌可以穿过波前。一旦使用任一辅助，本局后续成绩只作练习。','明白了',null)}
+function help(){modal('怎么跳？','向右接到冬冬，再带他返回起点。接到冬冬时记单程用时，回到起点时记全程用时，两项各有排行榜。游客可以直接游玩。登录后，从开局起关闭触碰提示和无敌即可参与排行。\n\n手机按住画面查看落点，拖动微调，松手传送。移出游戏画面后松手可取消。跳距由落点决定，圆内短跳，圆外沿该方向跳到圈边。每跳冷却 0.5 秒。电脑可用鼠标点击，或按 ← → 转向、空格传送。\n\n白色亮边是钟波的危险波前，浅色拖尾是它刚扫过的位置。你可以跳到波纹另一侧。越过去程中线，靠近冬冬的一侧会增加四座钟。\n\n开启提示可见钟波倒计时和落点危险颜色。开启无敌可以穿过波前。一旦使用任一辅助，本局后续成绩只作练习。','明白了',null)}
 $('#help').onclick=help;
 function pause(){if(run==='playing'&&!dialog.open&&!panelOpen)modal('行动暂停','波纹已暂停传播。','继续行动',null,true)}
-$('#pause').onclick=()=>{if(run==='ready')activate();else pause()};window.addEventListener('blur',pause);document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
+$('#pause').onclick=()=>{if(run==='ready')activate();else pause()};
+function suspendInput(){endInput();pause()}
+window.addEventListener('blur',suspendInput);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendInput()});
 window.GameUI={
   pauseForPanel(){panelOpen=true;endInput()},
   resumeFromPanel(){panelOpen=false;last=null;if(!dialog.open)canvas.focus({preventScroll:true})}
@@ -112,7 +125,7 @@ function status(){
   $('#progress').style.width=runBest+'%';
   $('#pause').textContent=run==='ready'?'开始行动':'暂停';
   const practice=(run==='ready'?hints||invincible:testRun)?' · 练习模式':'';
-  const radio=run==='ended'?'行动结束':returning?'已接到冬冬，向左返回起点。':run==='ready'?(coarsePointer.matches?'点圆内短跳，点圆外就朝手指方向跳到圈边。':'向右接到冬冬，再带他回到起点。'):half?'四座新钟已启动，继续向右接近冬冬。':'向右接近冬冬，避开白色波前。';
+  const radio=run==='ended'?'行动结束':returning?'已接到冬冬，向左返回起点。':run==='ready'?(coarsePointer.matches?'按住拖动看落点，松手传送。':'向右接到冬冬，再带他回到起点。'):half?'四座新钟已启动，继续向右接近冬冬。':'向右接近冬冬，避开白色波前。';
   $('#radio').textContent=radio+practice;
 }
 function finish(won,landedOnWave=false){
@@ -126,6 +139,7 @@ function destination(v){
   const rect=canvas.getBoundingClientRect();
   const dx=(pointerAim.x-rect.left)/v.s+v.x-player.x;
   const dy=(pointerAim.y-rect.top)/v.s+v.y-player.y;
+  if(touchAimId!==null&&Math.hypot(dx,dy)*v.s<=3)return {...player};
   // Treat the displayed pixel containing the player as the current location.
   if(Math.floor(pointerAim.x)===Math.floor(rect.left+(player.x-v.x)*v.s)
     &&Math.floor(pointerAim.y)===Math.floor(rect.top+(player.y-v.y)*v.s))return {...player};
@@ -155,9 +169,9 @@ function contact(point,since=time){
     return distance>=first-BODY-EDGE&&distance<=last+BODY+EDGE
   })
 }
-function leap(){
+function leap(landing){
   if((run!=='playing'&&run!=='ready')||paused||panelOpen||time+1e-9<nextJumpAt)return;
-  const to=destination();
+  const to=landing??destination();
   if(to.x===player.x&&to.y===player.y)return;
   if(!inMap(to)){$('#radio').textContent='落点在山沿外，请选近一点的位置或换个方向。';return}
   activate();
@@ -251,16 +265,35 @@ function aim(e){
   if(to.x!==player.x||to.y!==player.y)angle=Math.atan2(to.y-player.y,to.x-player.x)
 }
 canvas.onpointerdown=e=>{
-  if(!e.isPrimary||e.button!==0||panelOpen||paused||(run!=='playing'&&run!=='ready'))return;
-  e.preventDefault();canvas.focus({preventScroll:true});aim(e);leap()
+  if(!e.isPrimary||e.button!==0||touchAimId!==null||panelOpen||paused||(run!=='playing'&&run!=='ready'))return;
+  e.preventDefault();canvas.focus({preventScroll:true});aim(e);
+  if(e.pointerType==='touch'){
+    touchAimId=e.pointerId;
+    canvas.setPointerCapture(e.pointerId)
+  }else leap()
 };
-canvas.onpointermove=e=>{if(e.pointerType==='mouse')aim(e)};
-canvas.onpointerleave=()=>{pointerAim=null};
+// Pointer capture delivers the release even if a finger slides onto a control.
+function touchOnBoard(e){return document.elementFromPoint(e.clientX,e.clientY)===canvas}
+canvas.onpointermove=e=>{
+  if(e.pointerId===touchAimId){
+    if(touchOnBoard(e))aim(e);else pointerAim=null
+  }else if(touchAimId===null&&e.pointerType==='mouse')aim(e)
+};
+canvas.onpointerup=e=>{
+  if(e.pointerId!==touchAimId)return;
+  e.preventDefault();
+  let landing=null;
+  if(touchOnBoard(e)){aim(e);landing=destination()}
+  clearTouchAim();
+  if(landing)leap(landing)
+};
+canvas.onpointercancel=canvas.onlostpointercapture=e=>{if(e.pointerId===touchAimId)clearTouchAim()};
+canvas.onpointerleave=e=>{if(touchAimId===null&&e.pointerType==='mouse')pointerAim=null};
 canvas.oncontextmenu=e=>e.preventDefault();
 window.addEventListener('keydown',e=>{
   if(panelOpen||dialog.open||(run!=='playing'&&run!=='ready'))return;
-  if(e.code==='Escape'){e.preventDefault();if(!e.repeat)pause();return}
-  if(e.target instanceof HTMLButtonElement)return;
+  if(e.code==='Escape'){e.preventDefault();if(!e.repeat){if(run==='ready')endInput();else pause()}return}
+  if(e.target instanceof HTMLButtonElement||touchAimId!==null)return;
   if(['ArrowLeft','ArrowRight','Space'].includes(e.code)){e.preventDefault();pointerAim=null;held.add(e.code);if(e.code==='Space'&&!e.repeat)leap()}
 });
 window.addEventListener('keyup',e=>held.delete(e.code));
@@ -591,6 +624,24 @@ function drawOverview(v){
 }
 const bearingLabel=$('#bearing'),rulerText=$('#rulerText'),rulerBar=$('#rulerBar');
 let rulerScale=0,rulerMeters=0;
+function drawTouchTarget(to,v,ink,valid){
+  // Draw in screen pixels. The cross stays at the landing; its flag remains visible above a fingertip.
+  const screenX=(to.x-v.x)*v.s,screenY=(to.y-v.y)*v.s;
+  const labelX=Math.min(v.w-screenX-24,Math.max(24-screenX,0));
+  const labelY=screenY>=62?-48:48;
+  ctx.save();ctx.translate(to.x,to.y);ctx.scale(1/v.s,1/v.s);
+  ctx.lineCap='round';ctx.beginPath();
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+    ctx.moveTo(dx*13,dy*13);ctx.lineTo(dx*23,dy*23)
+  }
+  ctx.moveTo(0,Math.sign(labelY)*23);ctx.lineTo(labelX,labelY);
+  ctx.strokeStyle='#163442';ctx.lineWidth=4;ctx.stroke();
+  ctx.strokeStyle=ink;ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle='#183847';ctx.fillRect(labelX-22,labelY-9,44,18);
+  ctx.fillStyle=ink;ctx.font='600 11px -apple-system,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(valid?'落点':'山沿外',labelX,labelY);
+  ctx.restore()
+}
 function draw(){
   const v=view(),{w,h,s,x,y}=v;if(!w||!h)return;const d=Math.min(devicePixelRatio||1,2);
   if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
@@ -614,7 +665,9 @@ function draw(){
   ring(player.x,player.y,JUMP,null,0,touchRange?'#c5f3ff12':'#c5f3ff0a');
   ctx.setLineDash(touchRange?[5/s,5/s]:[3/s,5/s]);
   ring(player.x,player.y,JUMP,touchRange&&cooling?'#cef3ff80':'#cef3ffd9',(touchRange?1.75:1)/s);ctx.setLineDash([]);
-  line(player.x,player.y,to.x,to.y,'#c2eeff85',1/s);ring(to.x,to.y,Math.max(4,3.5/s),aimInk,1.5/s);
+  if(touchAimId===null||pointerAim){
+    line(player.x,player.y,to.x,to.y,'#c2eeff85',1/s);ring(to.x,to.y,Math.max(4,3.5/s),aimInk,1.5/s)
+  }
   if(cooling&&(touchRange||valid)){
     const fraction=1-(nextJumpAt-time)/JUMP_COOLDOWN;
     const center=touchRange?player:to;
@@ -624,6 +677,7 @@ function draw(){
     ctx.strokeStyle=touchRange?'#b8f5ec':'#edfcff';ctx.lineWidth=(touchRange?2.5:1.75)/s;ctx.stroke()
   }
   drawPlayer(v);
+  if(touchAimId!==null&&pointerAim)drawTouchTarget(to,v,aimInk,valid);
   if(hints&&!wideView&&run==='playing'){
     const here=inspectLanding(player);
     if(Number.isFinite(here))drawWarning(player,here===0?'钟波经过':'钟波将至 · '+here.toFixed(1)+' 秒',v);
@@ -640,7 +694,7 @@ function draw(){
     rulerMeters=meters;rulerScale=s;rulerText.textContent=meters+' m';rulerBar.style.width=meters*s+'px'
   }
 }
-let readyAimX,readyAimY,readyAngle;
+let readyAimX,readyAimY,readyAngle,readyTouchId;
 function frame(now){
   if(run==='playing'&&!paused&&!panelOpen){
     let remain=last===null?0:Math.min(.15,(now-last)/1000);
@@ -650,15 +704,15 @@ function frame(now){
   if(run==='ready'&&!paused&&!panelOpen){
     angle+=((held.has('ArrowRight')?1:0)-(held.has('ArrowLeft')?1:0))*2.8*(last===null?0:Math.min(.1,(now-last)/1000));
     const aimX=pointerAim?.x,aimY=pointerAim?.y,d=Math.min(devicePixelRatio||1,2);
-    if(readyAngle!==angle||readyAimX!==aimX||readyAimY!==aimY||
+    if(readyTouchId!==touchAimId||readyAngle!==angle||readyAimX!==aimX||readyAimY!==aimY||
        canvas.width!==Math.round(canvas.clientWidth*d)||canvas.height!==Math.round(canvas.clientHeight*d)){
-      draw();readyAngle=angle;readyAimX=aimX;readyAimY=aimY;
+      draw();readyTouchId=touchAimId;readyAngle=angle;readyAimX=aimX;readyAimY=aimY;
     }
   }
   last=now;requestAnimationFrame(frame)
 }
 $('#zoom').onclick=()=>{
-  pointerAim=null;wideView=!wideView;$('#zoom').textContent=wideView?'返回局部 ↙':'展开全图 ↗';
+  endInput();wideView=!wideView;$('#zoom').textContent=wideView?'返回局部 ↙':'展开全图 ↗';
   $('#zoom').setAttribute('aria-pressed',String(wideView));canvas.focus({preventScroll:true});draw()
 };
 const full=$('#full');
@@ -670,7 +724,7 @@ full.onclick=async()=>{
 document.addEventListener('fullscreenchange',()=>{
   const title=document.fullscreenElement?'退出全屏':'全屏';full.setAttribute('aria-label',title);full.title=title;draw()
 });
-window.addEventListener('resize',()=>{if(player)draw()});
+window.addEventListener('resize',()=>{clearTouchAim();if(player)draw()});
 audioUI();start();requestAnimationFrame(frame);
 </script><style>
 .rk-tools{display:inline-flex;gap:6px;align-items:center}.rk-tools button{display:inline-flex;align-items:center;gap:5px;max-width:112px}.rk-tools .rk-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rk-tools svg{flex-shrink:0;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}.rk-tools button[aria-current="true"]{border-color:#9cced4}
